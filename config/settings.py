@@ -144,12 +144,14 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:8000',  # Add localhost for local testing
     'http://127.0.0.1:8000',  # Add 127.0.0.1 for local testing
+    'http://academyprism.uz',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:8000',  # Add localhost for local testing
     'http://127.0.0.1:8000',  # Add 127.0.0.1 for local testing
+    'http://academyprism.uz',
 
 ]
 
