@@ -20,7 +20,7 @@ class CourseRegistrationCreateView(generics.CreateAPIView):
 
 
 class CourseRegistrationListView(generics.ListAPIView):
-    queryset = CourseRegistration.objects.all().order_by('-created_at')
+    queryset = CourseRegistration.objects.all().prefetch_related('course').order_by('-created_at')
     serializer_class = CourseRegistrationSerializer
     permission_classes = []
 
@@ -30,7 +30,7 @@ class CourseRegistrationListView(generics.ListAPIView):
         return super().list(request, *args, **kwargs)
 
     def export_to_excel(self):
-        registrations = self.get_queryset().select_related('course')
+        registrations = self.get_queryset()
 
         wb = Workbook()
         ws = wb.active
@@ -45,20 +45,21 @@ class CourseRegistrationListView(generics.ListAPIView):
             bottom=Side(style='thin')
         )
 
-        headers = ["Full Name", "Email", "Course", "Notes", "Created At"]
+        headers = ["Full Name", "Email", "Courses", "Notes", "Created At"]
         ws.append(headers)
         for col_num, column_title in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col_num)
             cell.font = header_font
             cell.alignment = center_alignment
             cell.border = thin_border
-            ws.column_dimensions[cell.column_letter].width = 20
+            ws.column_dimensions[cell.column_letter].width = 25
 
         for row_num, reg in enumerate(registrations, start=2):
+            course_names = ", ".join([course.name for course in reg.course.all()])
             row = [
                 reg.full_name,
                 reg.email,
-                reg.course.name,
+                course_names,
                 reg.notes or "",
                 reg.created_at.strftime('%Y-%m-%d %H:%M'),
             ]
